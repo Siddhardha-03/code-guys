@@ -1,0 +1,20 @@
+/* Import our professional theme */
+@import './styles/theme.css';
+
+/* Keep Tailwind for utility classes */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for Monaco Editor */
+.monaco-editor {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 300px;
+}
+
+@media (max-width: 640px) {
+  .monaco-editor {
+    min-height: 200px;
+  }
+}
