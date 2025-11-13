@@ -16,7 +16,7 @@ const Navbar = ({ user, onLogout }) => {
         <div className="flex justify-between items-center">
           {/* Logo and site name - Left */}
           <Link to="/" className="navbar-brand">
-            <span className="mr-2"></span>
+            <span className="mr-2"><code>&lt;/&gt;</code></span>
             <span>CodeGuy</span>
           </Link>
 
