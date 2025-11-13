@@ -1,6 +1,3 @@
-// This file has been cleaned for redundancy and simplified.
-// Functional behavior remains identical to previous version.
-
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -15,14 +12,23 @@ const compilerRoutes = require('./routes/compiler');
 const adminRoutes = require('./routes/admin');
 const codeDraftRoutes = require('./routes/codeDrafts');
 
-// Create Express app
 const app = express();
 
 // Middleware
+
+// CORS - allow frontend URL and preflight requests
 app.use(cors({
-  origin: process.env.CLIENT_URL,
+  origin: process.env.CLIENT_URL || 'http://localhost:3000', // fallback for dev
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true
 }));
+
+// Handle preflight requests manually for all routes
+app.options('*', cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true
+}));
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
@@ -38,30 +44,30 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+// Ensure DB schema
 async function ensureDatabaseSchema() {
   const connection = await pool.getConnection();
-
   try {
     const [exampleColumn] = await connection.query("SHOW COLUMNS FROM questions LIKE 'examples'");
     if (exampleColumn.length === 0) {
-      console.log("[DB] Adding missing 'examples' column to questions table");
+      console.log("[DB] Adding missing 'examples' column");
       await connection.query("ALTER TABLE questions ADD COLUMN examples JSON NULL");
     }
 
     const [languageSupportedColumn] = await connection.query("SHOW COLUMNS FROM questions LIKE 'language_supported'");
     if (languageSupportedColumn.length === 0) {
-      console.log("[DB] Adding missing 'language_supported' column to questions table");
+      console.log("[DB] Adding missing 'language_supported' column");
       await connection.query("ALTER TABLE questions ADD COLUMN language_supported JSON NULL");
     }
 
     const [tagsColumn] = await connection.query("SHOW COLUMNS FROM questions LIKE 'tags'");
     if (tagsColumn.length === 0) {
-      console.log("[DB] Adding missing 'tags' column to questions table");
+      console.log("[DB] Adding missing 'tags' column");
       await connection.query("ALTER TABLE questions ADD COLUMN tags JSON NULL");
     }
-  } catch (schemaError) {
-    console.error('[DB] Schema verification failed:', schemaError.message);
-    throw schemaError;
+  } catch (err) {
+    console.error('[DB] Schema verification failed:', err.message);
+    throw err;
   } finally {
     connection.release();
   }
@@ -82,12 +88,12 @@ app.use('/api/compiler', compilerRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/code-drafts', codeDraftRoutes);
 
-// Health check route
+// Health check
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Server is running' });
 });
 
-// Error handling middleware
+// Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
@@ -105,7 +111,7 @@ ensureDatabaseSchema()
       console.log(`Environment: ${process.env.NODE_ENV}`);
     });
   })
-  .catch((error) => {
-    console.error('[DB] Failed to ensure schema. Shutting down.', error);
+  .catch((err) => {
+    console.error('[DB] Failed to ensure schema. Shutting down.', err);
     process.exit(1);
   });
