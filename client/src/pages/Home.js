@@ -61,7 +61,7 @@ const Home = ({ user }) => {
       {/* Call to Action */}
       <section className="bg-primary-600 text-white rounded-lg p-8 text-center">
         <h2 className="text-3xl font-bold mb-4">Ready to become a better programmer?</h2>
-        <p className="text-xl mb-6">Join thousands of developers who are improving their skills with CodeGuy.</p>
+        <p className="text-xl mb-4">Join thousands of developers who are improving their skills with CodeGuy.</p>
         <Link
           to={user ? "/practice" : "/register"}
           className="bg-white text-primary-600 hover:bg-gray-100 px-6 py-3 rounded-md font-medium inline-block transition-colors"

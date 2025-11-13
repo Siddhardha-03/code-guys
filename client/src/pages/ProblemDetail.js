@@ -1289,13 +1289,13 @@ const ProblemDetail = ({ user }) => {
                             <div>
                               <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Input:</span>
                               <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded mt-1">
-                                <code className="text-xs font-mono">{testCase.input}</code>
+                                <code className="text-xm font-mono">{testCase.input}</code>
                               </div>
                             </div>
                             <div>
                               <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Expected Output:</span>
                               <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded mt-1">
-                                <code className="text-xs font-mono">
+                                <code className="text-xm font-mono">
                                   {testCase.hidden ? 'Hidden until submission' : testCase.expected_output}
                                 </code>
                               </div>

@@ -684,7 +684,7 @@ h5 { font-size: 1.125rem; font-weight: 500; }
 h6 { font-size: 1rem; font-weight: 500; }
 
 p {
-  color: var(--text-secondary);
+  color: white;
   margin-bottom: 1rem;
 }
 
