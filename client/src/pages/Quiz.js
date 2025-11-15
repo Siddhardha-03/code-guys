@@ -69,15 +69,15 @@ const Quiz = ({ user }) => {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold text-center">Coding Quizzes</h1>
-      <p className="text-gray-600 text-center">Test your knowledge with our collection of programming quizzes.</p>
+    <div className="space-y-4 sm:space-y-6 max-w-5xl mx-auto px-3 sm:px-4">
+      <h1 className="text-2xl sm:text-3xl font-bold text-center">Coding Quizzes</h1>
+      <p className="text-sm sm:text-base text-gray-600 text-center">Test your knowledge with our collection of programming quizzes.</p>
       
       {/* Filters */}
-      <div className="bg-white p-4 rounded-lg shadow-sm">
-        <form onSubmit={handleSearchSubmit} className="flex flex-wrap gap-4 justify-center">
+      <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm">
+        <form onSubmit={handleSearchSubmit} className="flex flex-wrap gap-3 sm:gap-4 justify-center">
           <div className="w-full md:w-auto">
-            <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="search" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               Search
             </label>
             <div className="flex gap-2">
@@ -88,11 +88,11 @@ const Quiz = ({ user }) => {
                 value={filters.search}
                 onChange={handleFilterChange}
                 placeholder="Search by title or description"
-                className="w-full md:w-72 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+                className="w-full md:w-72 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm sm:text-base py-1.5 sm:py-2 px-2 sm:px-3"
               />
               <button
                 type="submit"
-                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
               >
                 Search
               </button>
@@ -100,7 +100,7 @@ const Quiz = ({ user }) => {
           </div>
 
           <div className="w-full md:w-auto">
-            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="category" className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
               Category
             </label>
             <select
@@ -108,7 +108,7 @@ const Quiz = ({ user }) => {
               name="category"
               value={filters.category}
               onChange={handleFilterChange}
-              className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500"
+              className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm sm:text-base py-1.5 sm:py-2 px-2 sm:px-3"
             >
               <option value="">All Categories</option>
               <option value="javascript">JavaScript</option>
@@ -138,15 +138,15 @@ const Quiz = ({ user }) => {
       ) : (
         <>
           {/* Quizzes grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-stretch">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 justify-items-stretch">
             {quizzes.length > 0 ? (
               quizzes.map((quiz) => (
                 <div key={quiz.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="p-6">
-                    <h2 className="text-xl font-semibold mb-2">{quiz.title}</h2>
-                    <p className="text-gray-600 mb-4 line-clamp-2">{quiz.description}</p>
+                  <div className="p-4 sm:p-6">
+                    <h2 className="text-lg sm:text-xl font-semibold mb-2">{quiz.title}</h2>
+                    <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4 line-clamp-2">{quiz.description}</p>
                     
-                    <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                    <div className="flex items-center justify-between text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
                       <div className="flex items-center">
                         <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -188,7 +188,7 @@ const Quiz = ({ user }) => {
                     
                     <Link 
                       to={`/quizzes/${quiz.id}`} 
-                      className="block w-full text-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+                      className="block w-full text-center px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
                     >
                       {quiz.userStatus === 'completed' ? 'Retake Quiz' : quiz.userStatus === 'in_progress' ? 'Continue Quiz' : 'Start Quiz'}
                     </Link>
@@ -204,22 +204,22 @@ const Quiz = ({ user }) => {
           
           {/* Pagination */}
           {quizzes.length > 0 && (
-            <div className="flex justify-center mt-6">
+            <div className="flex justify-center mt-4 sm:mt-6">
               <nav className="flex items-center space-x-2">
                 <button
                   onClick={() => handlePageChange(pagination.page - 1)}
                   disabled={pagination.page === 1}
-                  className="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-2 sm:px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
                 >
                   Previous
                 </button>
-                <span className="text-gray-700">
+                <span className="text-gray-700 text-xs sm:text-sm">
                   Page {pagination.page} of {Math.ceil(pagination.total / pagination.limit)}
                 </span>
                 <button
                   onClick={() => handlePageChange(pagination.page + 1)}
                   disabled={pagination.page >= Math.ceil(pagination.total / pagination.limit)}
-                  className="px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-2 sm:px-3 py-1 rounded-md border border-gray-300 bg-white text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-xs sm:text-sm"
                 >
                   Next
                 </button>

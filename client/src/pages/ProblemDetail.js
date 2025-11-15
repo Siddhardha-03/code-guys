@@ -397,21 +397,21 @@ const ProblemDetail = ({ user }) => {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Problem Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="w-full px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="w-full px-3 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 w-full sm:w-auto">
               <button
                 onClick={() => navigate('/practice')}
-                className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                className="text-gray-600 hover:text-gray-900 flex items-center gap-2 text-sm sm:text-base"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
                 </svg>
                 Back to Problems
               </button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{problem?.title || 'Loading...'}</h1>
-                <div className="flex items-center gap-3 mt-2">
+              <div className="w-full sm:w-auto">
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{problem?.title || 'Loading...'}</h1>
+                <div className="flex items-center gap-2 sm:gap-3 mt-2 flex-wrap">
                   {problem?.difficulty && (
                     <span className={`px-2 py-1 text-xs font-medium rounded-full ${
                       problem.difficulty.toLowerCase() === 'easy' ? 'bg-green-100 text-green-800' :
@@ -427,7 +427,7 @@ const ProblemDetail = ({ user }) => {
                     </span>
                   )}
                   {user && submissionStats.attempts > 0 && (
-                    <span className="text-sm text-gray-600">
+                    <span className="text-xs sm:text-sm text-gray-600">
                       {submissionStats.attempts} attempt{submissionStats.attempts !== 1 ? 's' : ''}
                     </span>
                   )}
@@ -435,7 +435,7 @@ const ProblemDetail = ({ user }) => {
               </div>
             </div>
             {problem?.tags && (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                 {problem.tags.slice(0, 3).map((tag) => (
                   <span key={tag} className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-md">
                     {tag}
@@ -453,16 +453,16 @@ const ProblemDetail = ({ user }) => {
       </div>
 
       {/* Main Content */}
-      <div className="w-full px-6 py-4 flex-1">
-        <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,40%)_minmax(0,60%)] gap-6 items-start">
+      <div className="w-full px-3 sm:px-6 py-4 flex-1">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,45%)_minmax(0,55%)] gap-4 sm:gap-6 items-start">
           {/* Left Panel - Problem Description with Tabs */}
-          <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+          <div className="bg-white rounded-lg shadow-sm border overflow-hidden order-2 lg:order-1">
             {/* Tab Navigation */}
-            <div className="border-b bg-gray-50">
-              <nav className="flex">
+            <div className="border-b bg-gray-50 overflow-x-auto">
+              <nav className="flex min-w-max">
                 <button
                   onClick={() => setActiveTab('description')}
-                  className={`px-4 py-3 text-sm font-medium border-b-2 ${
+                  className={`px-3 sm:px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap ${
                     activeTab === 'description'
                       ? 'border-blue-500 text-blue-600 bg-white'
                       : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -473,7 +473,7 @@ const ProblemDetail = ({ user }) => {
                 {user && (
                   <button
                     onClick={() => setActiveTab('submissions')}
-                    className={`px-4 py-3 text-sm font-medium border-b-2 ${
+                    className={`px-3 sm:px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap ${
                       activeTab === 'submissions'
                         ? 'border-blue-500 text-blue-600 bg-white'
                         : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -484,7 +484,7 @@ const ProblemDetail = ({ user }) => {
                 )}
                 <button
                   onClick={() => setActiveTab('hints')}
-                  className={`px-4 py-3 text-sm font-medium border-b-2 ${
+                  className={`px-3 sm:px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap ${
                     activeTab === 'hints'
                       ? 'border-blue-500 text-blue-600 bg-white'
                       : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -496,7 +496,7 @@ const ProblemDetail = ({ user }) => {
             </div>
 
             {/* Tab Content */}
-            <div className="h-full overflow-y-auto p-6">
+            <div className="h-full overflow-y-auto p-4 sm:p-6 max-h-[600px] lg:max-h-[calc(100vh-300px)]">
               {activeTab === 'description' && (
                 <div className="space-y-6">
                   {/* Problem Description */}
@@ -706,21 +706,23 @@ const ProblemDetail = ({ user }) => {
           </div>
 
           {/* Right Panel - Code Editor and Output */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 order-1 lg:order-2">
             {/* Code Editor */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-600 overflow-hidden flex-1">
-              <div className="border-b bg-gray-50 dark:bg-gray-700 dark:border-gray-600 px-4 py-3 space-y-3">
-                <div className="flex items-center gap-4">
-                  <div>
-                    <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">{problem?.title}</h1>
+              <div className="border-b bg-gray-50 dark:bg-gray-700 dark:border-gray-600 px-3 sm:px-4 py-3 space-y-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+                  <div className="flex-1 min-w-0">
+                    <h1 className="text-lg sm:text-2xl font-semibold text-gray-900 dark:text-gray-100 truncate">{problem?.title}</h1>
                     {problem?.function_name && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400">Function Name: <span className="font-mono">{problem.function_name}</span></p>
+                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
+                        Function Name: <span className="font-mono">{problem.function_name}</span>
+                      </p>
                     )}
                   </div>
                   <select
                     value={language}
                     onChange={handleLanguageChange}
-                    className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-500 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300 focus:border-blue-500 dark:focus:border-blue-300"
+                    className="w-full sm:w-auto px-3 py-1.5 sm:py-1 text-sm border border-gray-300 dark:border-gray-500 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300 focus:border-blue-500 dark:focus:border-blue-300"
                   >
                     <option value="javascript">JavaScript</option>
                     <option value="python">Python</option>
@@ -729,12 +731,12 @@ const ProblemDetail = ({ user }) => {
                   </select>
                 </div>
 
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="flex items-center gap-3">
+                <div className="flex flex-col gap-3">
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
                     <select
                       value={testCaseIndex}
                       onChange={(e) => setTestCaseIndex(parseInt(e.target.value, 10))}
-                      className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-500 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300 focus:border-blue-500 dark:focus:border-blue-300"
+                      className="w-full sm:w-auto px-3 py-2 text-sm border border-gray-300 dark:border-gray-500 rounded-md bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-300 focus:border-blue-500 dark:focus:border-blue-300"
                     >
                       {testCases.map((testCase, index) => (
                         <option key={index} value={index}>
@@ -742,23 +744,23 @@ const ProblemDetail = ({ user }) => {
                         </option>
                       ))}
                     </select>
-                    <span className="text-sm text-gray-600 dark:text-gray-300">
-                      {testCases.length} test case{testCases.length !== 1 ? 's' : ''} available ({testCases.filter(tc => !tc.hidden).length} visible, {testCases.filter(tc => tc.hidden).length} hidden)
+                    <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-300">
+                      {testCases.length} test case{testCases.length !== 1 ? 's' : ''} ({testCases.filter(tc => !tc.hidden).length} visible, {testCases.filter(tc => tc.hidden).length} hidden)
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                     <button
                       onClick={handleRunCode}
                       disabled={executing || submitting}
-                      className="px-3 py-2 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-100 dark:hover:bg-gray-200 dark:text-gray-900"
+                      className="w-full sm:w-auto px-4 py-2 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-100 dark:hover:bg-gray-200 dark:text-gray-900"
                     >
                       {executing ? 'Running…' : 'Run Test'}
                     </button>
                     <button
                       onClick={handleSubmitCode}
                       disabled={submitting}
-                      className="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-400 dark:hover:bg-blue-300 dark:text-blue-950"
+                      className="w-full sm:w-auto px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-400 dark:hover:bg-blue-300 dark:text-blue-950"
                     >
                       {submitting ? 'Submitting…' : 'Submit Solution'}
                     </button>
@@ -766,12 +768,12 @@ const ProblemDetail = ({ user }) => {
                 </div>
               </div>
               
-              <div className="h-[720px]">
+              <div className="h-[400px] sm:h-[500px] lg:h-[720px]">
                 <CodeEditor
                   code={code}
                   language={language}
                   onChange={handleCodeChange}
-                  height="720px"
+                  height="100%"
                   title="Solution"
                 />
               </div>
@@ -779,11 +781,11 @@ const ProblemDetail = ({ user }) => {
 
             {/* Output Panel */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-600 overflow-hidden">
-              <div className="border-b bg-gray-50 dark:bg-gray-700 dark:border-gray-600 px-4 py-3">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Output</h3>
+              <div className="border-b bg-gray-50 dark:bg-gray-700 dark:border-gray-600 px-3 sm:px-4 py-3">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100">Output</h3>
               </div>
               
-              <div className="p-4 h-64 overflow-y-auto text-gray-900 dark:text-gray-100">
+              <div className="p-3 sm:p-4 h-48 sm:h-64 overflow-y-auto text-gray-900 dark:text-gray-100">
                 {error && (
                   <div className="bg-red-100 dark:bg-red-900/40 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-200 px-4 py-3 rounded mb-4">
                     <strong>Error:</strong> {error}
@@ -829,10 +831,10 @@ const ProblemDetail = ({ user }) => {
                           return (
                             <div
                               key={test.testCaseNumber}
-                              className={`rounded-lg border px-4 py-3 text-sm ${badgeClasses}`}
+                              className={`rounded-lg border px-3 sm:px-4 py-3 text-sm ${badgeClasses}`}
                             >
                               <div className="flex items-center justify-between mb-2">
-                                <span className="font-semibold">
+                                <span className="font-semibold text-sm">
                                   Test Case {test.testCaseNumber} {test.hidden ? '(Hidden)' : ''}
                                 </span>
                                 <span className="text-xs uppercase tracking-wide">
@@ -840,22 +842,22 @@ const ProblemDetail = ({ user }) => {
                                 </span>
                               </div>
 
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                                 <div>
                                   <span className="font-medium text-gray-600 dark:text-gray-300 block mb-1">Input</span>
-                                  <div className="bg-white/60 dark:bg-gray-900 border border-white/40 dark:border-gray-600 rounded p-2 font-mono">
+                                  <div className="bg-white/60 dark:bg-gray-900 border border-white/40 dark:border-gray-600 rounded p-2 font-mono break-all">
                                     {test.input || '—'}
                                   </div>
                                 </div>
                                 <div>
                                   <span className="font-medium text-gray-600 dark:text-gray-300 block mb-1">Expected</span>
-                                  <div className="bg-white/60 dark:bg-gray-800 border border-white/40 dark:border-gray-700 rounded p-2 font-mono">
+                                  <div className="bg-white/60 dark:bg-gray-800 border border-white/40 dark:border-gray-700 rounded p-2 font-mono break-all">
                                     {test.hidden ? 'Hidden' : (test.expectedOutput || '—')}
                                   </div>
                                 </div>
                                 <div>
                                   <span className="font-medium text-gray-600 dark:text-gray-300 block mb-1">Actual</span>
-                                  <div className="bg-white/60 dark:bg-gray-800 border border-white/40 dark:border-gray-700 rounded p-2 font-mono">
+                                  <div className="bg-white/60 dark:bg-gray-800 border border-white/40 dark:border-gray-700 rounded p-2 font-mono break-all">
                                     {test.actualOutput || (test.error ? 'Error' : '—')}
                                   </div>
                                 </div>
@@ -870,7 +872,7 @@ const ProblemDetail = ({ user }) => {
                               {test.error && (
                                 <div className="mt-2">
                                   <span className="font-medium text-gray-600 dark:text-gray-300 block mb-1">Error</span>
-                                  <pre className="bg-white/60 dark:bg-gray-900 border border-white/40 dark:border-gray-600 rounded p-2 font-mono whitespace-pre-wrap">
+                                  <pre className="bg-white/60 dark:bg-gray-900 border border-white/40 dark:border-gray-600 rounded p-2 font-mono whitespace-pre-wrap text-xs break-all">
                                     {test.error}
                                   </pre>
                                 </div>

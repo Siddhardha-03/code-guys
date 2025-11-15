@@ -205,26 +205,26 @@ const QuizDetail = ({ user }) => {
     const progressAngle = Math.min(animatedPercentage, 100) * 3.6;
 
     return (
-      <div className="bg-white p-6 rounded-lg shadow-sm max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-center mb-6">Quiz Results</h1>
+      <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm max-w-4xl mx-auto">
+        <h1 className="text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6">Quiz Results</h1>
 
         <div className="flex flex-col items-center gap-4 mb-10">
-          <div className="relative flex items-center justify-center">
+          <div className="relative flex items-center justify-center scale-[0.85] sm:scale-100">
             <div
-              className="w-40 h-40 rounded-full flex items-center justify-center shadow-inner"
+              className="w-32 h-32 sm:w-40 sm:h-40 rounded-full flex items-center justify-center shadow-inner"
               style={{
                 background: `conic-gradient(#2563eb ${progressAngle}deg, #DBEAFE ${progressAngle}deg 360deg)`
               }}
             >
               <div className="w-32 h-32 rounded-full bg-white flex items-center justify-center shadow-md">
-                <span className="text-4xl font-bold text-primary-700">
+                <span className="text-3xl sm:text-4xl font-bold text-primary-700">
                   {animatedPercentage}
-                  <span className="text-xl text-primary-500">%</span>
+                  <span className="text-lg sm:text-xl text-primary-500">%</span>
                 </span>
               </div>
             </div>
           </div>
-          <p className="text-gray-600 text-center max-w-md">
+          <p className="text-gray-600 text-center max-w-md text-sm sm:text-base">
             {animatedPercentage >= finalPercentage
               ? 'Great job! Here is the breakdown of your performance.'
               : 'Calculating your score...'}
@@ -232,21 +232,21 @@ const QuizDetail = ({ user }) => {
         </div>
 
         <div className="grid gap-4 md:grid-cols-4 mb-8">
-          <div className="p-4 rounded-xl border border-primary-100 bg-primary-50/60 text-center">
-            <p className="text-sm uppercase tracking-wide text-primary-600 font-semibold">Points</p>
-            <span className="text-4xl font-bold text-primary-700">{correctCount}/{totalQuestions}</span>
+          <div className="p-3 sm:p-4 rounded-xl border border-primary-100 bg-primary-50/60 text-center">
+            <p className="text-xs sm:text-sm uppercase tracking-wide text-primary-600 font-semibold">Points</p>
+            <span className="text-2xl sm:text-4xl font-bold text-primary-700">{correctCount}/{totalQuestions}</span>
           </div>
-          <div className="p-4 rounded-xl border border-green-100 bg-green-50/70 text-center">
-            <p className="text-sm uppercase tracking-wide text-green-600 font-semibold">Correct</p>
-            <span className="text-4xl font-bold text-green-700">{correctCount}</span>
+          <div className="p-3 sm:p-4 rounded-xl border border-green-100 bg-green-50/70 text-center">
+            <p className="text-xs sm:text-sm uppercase tracking-wide text-green-600 font-semibold">Correct</p>
+            <span className="text-2xl sm:text-4xl font-bold text-green-700">{correctCount}</span>
           </div>
-          <div className="p-4 rounded-xl border border-red-100 bg-red-50/70 text-center">
-            <p className="text-sm uppercase tracking-wide text-red-600 font-semibold">Incorrect</p>
-            <span className="text-4xl font-bold text-red-700">{incorrectCount}</span>
+          <div className="p-3 sm:p-4 rounded-xl border border-red-100 bg-red-50/70 text-center">
+            <p className="text-xs sm:text-sm uppercase tracking-wide text-red-600 font-semibold">Incorrect</p>
+            <span className="text-2xl sm:text-4xl font-bold text-red-700">{incorrectCount}</span>
           </div>
-          <div className="p-4 rounded-xl border border-gray-100 bg-gray-50 text-center">
-            <p className="text-sm uppercase tracking-wide text-gray-600 font-semibold">Unanswered</p>
-            <span className="text-4xl font-bold text-gray-800">{unansweredCount}</span>
+          <div className="p-3 sm:p-4 rounded-xl border border-gray-100 bg-gray-50 text-center">
+            <p className="text-xs sm:text-sm uppercase tracking-wide text-gray-600 font-semibold">Unanswered</p>
+            <span className="text-2xl sm:text-4xl font-bold text-gray-800">{unansweredCount}</span>
           </div>
         </div>
 
@@ -286,7 +286,7 @@ const QuizDetail = ({ user }) => {
                   return (
                     <div
                       key={optionIndex}
-                      className={`p-3 rounded-lg text-sm flex items-center justify-between ${optionClasses}`}
+                      className={`p-2 sm:p-3 rounded-lg text-xs sm:text-sm flex items-center justify-between ${optionClasses}`}
                     >
                       <span className="text-gray-800">{option}</span>
                       <div className="flex items-center gap-2">
@@ -323,7 +323,7 @@ const QuizDetail = ({ user }) => {
         <div className="mt-8 flex justify-center">
           <button
             onClick={() => navigate('/quizzes')}
-            className="px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
+            className="px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
           >
             Back to Quizzes
           </button>
@@ -341,13 +341,13 @@ const QuizDetail = ({ user }) => {
   }
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-4 sm:space-y-6 max-w-5xl mx-auto px-3 sm:px-4">
       {/* Quiz header */}
       <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h1 className="text-2xl font-bold text-gray-800">{quiz.title}</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800">{quiz.title}</h1>
         <div className="flex justify-between items-center mt-4">
           <div>
-            <span className="text-sm text-gray-500">
+            <span className="text-xs sm:text-sm text-gray-500">
               {quiz.questions.length} Questions Total
             </span>
             <div className="text-xs text-primary-600 mt-1">
@@ -355,7 +355,7 @@ const QuizDetail = ({ user }) => {
             </div>
           </div>
           {timeLeft > 0 && (
-            <div className="text-sm font-medium">
+            <div className="text-xs sm:text-sm font-medium">
               Time remaining: <span className={`${timeLeft <= 300 ? 'text-red-600' : 'text-primary-600'}`}>{formatTime(timeLeft)}</span>
               {timeLeft <= 300 && (
                 <span className="ml-2 text-red-600 animate-pulse">⚠️</span>
@@ -382,15 +382,15 @@ const QuizDetail = ({ user }) => {
       </div>
 
       <div className="bg-white p-6 rounded-lg shadow-sm">
-        <h3 className="text-lg font-semibold mb-4">Questions</h3>
-        <div className="max-h-[60vh] overflow-y-auto space-y-6 pr-2">
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Questions</h3>
+        <div className="max-h-[60vh] overflow-y-auto space-y-4 sm:space-y-6 pr-1 sm:pr-2">
           {(quiz.questions || []).map((question, questionIndex) => (
-            <div key={question.id} className="border border-gray-200 rounded-lg p-4">
+            <div key={question.id} className="border border-gray-200 rounded-lg p-3 sm:p-4">
               <div className="flex items-start gap-3 mb-4">
-                <span className="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary-100 text-primary-700 font-semibold">
+                <span className="flex-shrink-0 inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary-100 text-primary-700 font-semibold text-sm sm:text-base">
                   {questionIndex + 1}
                 </span>
-                <h2 className="text-lg font-semibold text-gray-900">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900">
                   {question.question || question.text}
                 </h2>
               </div>
@@ -400,22 +400,20 @@ const QuizDetail = ({ user }) => {
                   <div
                     key={optionIndex}
                     onClick={() => handleAnswerSelect(question.id, optionIndex)}
-                    className={`p-3 rounded-lg border cursor-pointer transition-colors 
-                      ${answers[question.id] === optionIndex
-                        ? 'border-primary-500 bg-primary-50 text-primary-700'
-                        : 'border-gray-300 hover:border-gray-400'}`}
+                    className={`p-2 sm:p-3 rounded-lg border cursor-pointer transition-colors ${answers[question.id] === optionIndex
+                      ? 'border-primary-500 bg-primary-50 text-primary-700'
+                      : 'border-gray-300 hover:border-gray-400'}`}
                   >
                     <div className="flex items-start">
-                      <div className={`flex-shrink-0 h-5 w-5 border rounded-full flex items-center justify-center mr-2 
-                        ${answers[question.id] === optionIndex
-                          ? 'border-primary-500 bg-primary-500'
-                          : 'border-gray-300'}`}
+                      <div className={`flex-shrink-0 h-5 w-5 border rounded-full flex items-center justify-center mr-2 ${answers[question.id] === optionIndex
+                        ? 'border-primary-500 bg-primary-500'
+                        : 'border-gray-300'}`}
                       >
                         {answers[question.id] === optionIndex && (
                           <div className="h-2 w-2 rounded-full bg-white"></div>
                         )}
                       </div>
-                      <span>{option}</span>
+                      <span className="text-xs sm:text-sm">{option}</span>
                     </div>
                   </div>
                 ))}
@@ -429,7 +427,7 @@ const QuizDetail = ({ user }) => {
         <button
           onClick={handleSubmitQuiz}
           disabled={isSubmitting || Object.values(answers).some(answer => answer === null)}
-          className="px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-3 sm:px-4 py-1.5 sm:py-2 border border-transparent text-xs sm:text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? 'Submitting...' : 'Submit Quiz'}
         </button>
