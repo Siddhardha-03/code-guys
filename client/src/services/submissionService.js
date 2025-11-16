@@ -1,11 +1,16 @@
 import axios from 'axios';
+import { auth } from '../config/firebase';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-// Set up axios with token
-const getAuthHeader = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+// Set up axios with Firebase token
+const getAuthHeader = async () => {
+  const user = auth.currentUser;
+  if (user) {
+    const token = await user.getIdToken();
+    return { Authorization: `Bearer ${token}` };
+  }
+  return {};
 };
 
 /**
@@ -16,7 +21,7 @@ const getAuthHeader = () => {
 export const getUserSubmissions = async (params = {}) => {
   try {
     const response = await axios.get(`${API_URL}/submissions/user`, {
-      headers: getAuthHeader(),
+      headers: await getAuthHeader(),
       params
     });
     return response.data.data?.submissions || [];
@@ -36,7 +41,7 @@ export const getUserSubmissions = async (params = {}) => {
 export const submitCode = async (questionId, submissionData) => {
   try {
     const response = await axios.post(`${API_URL}/submissions/${questionId}`, submissionData, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -53,7 +58,7 @@ export const submitCode = async (questionId, submissionData) => {
 export const runCode = async (codeData) => {
   try {
     const response = await axios.post(`${API_URL}/submissions/run`, codeData, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -70,7 +75,7 @@ export const runCode = async (codeData) => {
 export const getSubmissionById = async (submissionId) => {
   try {
     const response = await axios.get(`${API_URL}/submissions/${submissionId}`, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -87,7 +92,7 @@ export const getSubmissionById = async (submissionId) => {
 export const getQuestionSubmissions = async (questionId) => {
   try {
     const response = await axios.get(`${API_URL}/submissions/question/${questionId}`, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data?.submissions || [];
   } catch (error) {

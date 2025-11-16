@@ -1,151 +1,96 @@
-// This file has been cleaned for redundancy and simplified.
-// Functional behavior remains identical to previous version.
-
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+// Firebase Authentication Controller
+const { verifyIdToken } = require('../config/firebase-admin');
 
 /**
- * Register a new user
+ * Sync Firebase user with local database
+ * Called after Firebase authentication on client side
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  */
-exports.register = async (req, res) => {
+exports.syncUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { firebase_uid, name, email, email_verified } = req.body;
     
     // Validate input
-    if (!name || !email || !password) {
+    if (!firebase_uid || !email) {
       return res.status(400).json({
         status: 'error',
-        message: 'Please provide name, email and password'
+        message: 'Firebase UID and email are required'
       });
     }
     
-    // Check if user already exists
+    // Check if user exists by firebase_uid
     const [existingUsers] = await req.db.execute(
-      'SELECT * FROM users WHERE email = ?',
-      [email]
+      'SELECT * FROM users WHERE firebase_uid = ?',
+      [firebase_uid]
     );
+    
+    let user;
     
     if (existingUsers.length > 0) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'User with this email already exists'
-      });
-    }
-    
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    
-    // Create new user (default role is 'student')
-    const [result] = await req.db.execute(
-      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-      [name, email, hashedPassword, 'student']
-    );
-    
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: result.insertId, name, email, role: 'student' },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-    
-    res.status(201).json({
-      status: 'success',
-      message: 'User registered successfully',
-      data: {
-        token,
-        user: {
-          id: result.insertId,
-          name,
-          email,
-          role: 'student'
-        }
+      // Update existing user
+      user = existingUsers[0];
+      
+      await req.db.execute(
+        'UPDATE users SET name = ?, email = ?, email_verified = ?, last_signed_in = NOW() WHERE firebase_uid = ?',
+        [name || user.name, email, email_verified ? 1 : 0, firebase_uid]
+      );
+      
+      // Fetch updated user
+      const [updatedUsers] = await req.db.execute(
+        'SELECT id, firebase_uid, name, email, email_verified, role, created_at, last_signed_in FROM users WHERE firebase_uid = ?',
+        [firebase_uid]
+      );
+      user = updatedUsers[0];
+    } else {
+      // Check if email is already used by another user
+      const [emailCheck] = await req.db.execute(
+        'SELECT * FROM users WHERE email = ?',
+        [email]
+      );
+      
+      if (emailCheck.length > 0) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Email is already registered with a different account'
+        });
       }
-    });
-  } catch (error) {
-    console.error('Registration error:', error.message);
-    res.status(500).json({
-      status: 'error',
-      message: 'Registration failed. Please try again.'
-    });
-  }
-};
-
-/**
- * Login a user
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- */
-exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    
-    // Validate input
-    if (!email || !password) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'Please provide email and password'
-      });
+      
+      // Create new user (default role is 'student')
+      const [result] = await req.db.execute(
+        'INSERT INTO users (firebase_uid, name, email, email_verified, role, last_signed_in) VALUES (?, ?, ?, ?, ?, NOW())',
+        [firebase_uid, name, email, email_verified ? 1 : 0, 'student']
+      );
+      
+      // Fetch created user
+      const [newUsers] = await req.db.execute(
+        'SELECT id, firebase_uid, name, email, email_verified, role, created_at, last_signed_in FROM users WHERE id = ?',
+        [result.insertId]
+      );
+      user = newUsers[0];
     }
-    
-    // Check if user exists
-    const [users] = await req.db.execute(
-      'SELECT * FROM users WHERE email = ?',
-      [email]
-    );
-    
-    if (users.length === 0) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'Invalid credentials'
-      });
-    }
-    
-    const user = users[0];
-    
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
-    
-    if (!isMatch) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'Invalid credentials'
-      });
-    }
-    
-    // Update last signed in timestamp
-    await req.db.execute(
-      'UPDATE users SET last_signed_in = NOW() WHERE id = ?',
-      [user.id]
-    );
-    
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user.id, name: user.name, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
     
     res.status(200).json({
       status: 'success',
-      message: 'Login successful',
+      message: 'User synced successfully',
       data: {
-        token,
         user: {
           id: user.id,
+          firebase_uid: user.firebase_uid,
           name: user.name,
           email: user.email,
-          role: user.role
+          email_verified: Boolean(user.email_verified),
+          role: user.role,
+          created_at: user.created_at,
+          last_signed_in: user.last_signed_in
         }
       }
     });
   } catch (error) {
-    console.error('Login error:', error.message);
+    console.error('Sync user error:', error.message);
     res.status(500).json({
       status: 'error',
-      message: 'Login failed. Please try again.'
+      message: 'Failed to sync user. Please try again.'
     });
   }
 };

@@ -1,11 +1,16 @@
 import axios from 'axios';
+import { auth } from '../config/firebase';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-// Set up axios with token
-const getAuthHeader = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+// Set up axios with Firebase token
+const getAuthHeader = async () => {
+  const user = auth.currentUser;
+  if (user) {
+    const token = await user.getIdToken();
+    return { Authorization: `Bearer ${token}` };
+  }
+  return {};
 };
 
 /**
@@ -16,7 +21,7 @@ const getAuthHeader = () => {
 export const createQuestion = async (questionData) => {
   try {
     const response = await axios.post(`${API_URL}/questions`, questionData, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -34,7 +39,7 @@ export const updateQuestion = async (id, questionData) => {
   try {
     console.log('AdminService: Updating question', id, 'with data:', questionData);
     const response = await axios.put(`${API_URL}/questions/${id}`, questionData, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     console.log('AdminService: Update response:', response.data);
     return response.data;
@@ -54,7 +59,7 @@ export const updateQuestion = async (id, questionData) => {
 export const deleteQuestion = async (id) => {
   try {
     const response = await axios.delete(`${API_URL}/questions/${id}`, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data;
   } catch (error) {
@@ -71,7 +76,7 @@ export const deleteQuestion = async (id) => {
 export const addTestCases = async (questionId, testCasesData) => {
   try {
     const response = await axios.post(`${API_URL}/questions/${questionId}/test-cases`, testCasesData, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data;
   } catch (error) {
@@ -87,7 +92,7 @@ export const addTestCases = async (questionId, testCasesData) => {
 export const getAllTestCases = async (questionId) => {
   try {
     const response = await axios.get(`${API_URL}/questions/${questionId}/all-test-cases`, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -103,7 +108,7 @@ export const getAllTestCases = async (questionId) => {
 export const createQuiz = async (quizData) => {
   try {
     const response = await axios.post(`${API_URL}/quizzes`, quizData, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -120,7 +125,7 @@ export const createQuiz = async (quizData) => {
 export const updateQuiz = async (id, quizData) => {
   try {
     const response = await axios.put(`${API_URL}/quizzes/${id}`, quizData, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data;
   } catch (error) {
@@ -136,7 +141,7 @@ export const updateQuiz = async (id, quizData) => {
 export const deleteQuiz = async (id) => {
   try {
     const response = await axios.delete(`${API_URL}/quizzes/${id}`, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data;
   } catch (error) {
@@ -153,7 +158,7 @@ export const deleteQuiz = async (id) => {
 export const addQuizQuestions = async (quizId, questionsData) => {
   try {
     const response = await axios.post(`${API_URL}/quizzes/${quizId}/questions`, questionsData, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data;
   } catch (error) {
@@ -170,7 +175,7 @@ export const addQuizQuestions = async (quizId, questionsData) => {
 export const getQuestionSubmissions = async (questionId, params = {}) => {
   try {
     const response = await axios.get(`${API_URL}/submissions/question/${questionId}`, {
-      headers: getAuthHeader(),
+      headers: await getAuthHeader(),
       params
     });
     return response.data.data;
@@ -186,7 +191,7 @@ export const getQuestionSubmissions = async (questionId, params = {}) => {
 export const getUsers = async () => {
   try {
     const response = await axios.get(`${API_URL}/admin/users`, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -201,7 +206,7 @@ export const getUsers = async () => {
 export const getPlatformStats = async () => {
   try {
     const response = await axios.get(`${API_URL}/admin/stats`, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -217,7 +222,7 @@ export const getPlatformStats = async () => {
 export const createUser = async (userData) => {
   try {
     const response = await axios.post(`${API_URL}/admin/users`, userData, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -234,7 +239,7 @@ export const createUser = async (userData) => {
 export const updateUserRole = async (userId, role) => {
   try {
     const response = await axios.put(`${API_URL}/admin/users/${userId}/role`, { role }, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data;
   } catch (error) {
@@ -250,7 +255,7 @@ export const updateUserRole = async (userId, role) => {
 export const deleteUser = async (userId) => {
   try {
     const response = await axios.delete(`${API_URL}/admin/users/${userId}`, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data;
   } catch (error) {
@@ -268,7 +273,7 @@ export const getLeaderboard = async (type = 'overall', limit = 10) => {
   try {
     console.log('Admin service: fetching leaderboard', { type, limit });
     const response = await axios.get(`${API_URL}/admin/leaderboard`, {
-      headers: getAuthHeader(),
+      headers: await getAuthHeader(),
       params: { type, limit }
     });
     console.log('Admin service: leaderboard response', response.data);
@@ -288,7 +293,7 @@ export const getRecentActivity = async (limit = 20) => {
   try {
     console.log('Admin service: fetching recent activity', { limit });
     const response = await axios.get(`${API_URL}/admin/leaderboard/recent-activity`, {
-      headers: getAuthHeader(),
+      headers: await getAuthHeader(),
       params: { limit }
     });
     console.log('Admin service: recent activity response', response.data);

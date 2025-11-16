@@ -1,161 +1,15 @@
-// This file has been cleaned for redundancy and simplified.
-// Functional behavior remains identical to previous version.
-
+// Firebase Authentication Routes
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
+const { syncUser } = require('../controllers/authController');
 const { authenticate } = require('../middlewares/auth');
 
 /**
- * @route   POST /api/auth/register
- * @desc    Register a new user
- * @access  Public
+ * @route   POST /api/auth/sync
+ * @desc    Sync Firebase user with local database
+ * @access  Public (Firebase token verified in controller)
  */
-router.post('/register', async (req, res) => {
-  try {
-    const { name, email, password } = req.body;
-    
-    // Validate input
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'Please provide name, email and password'
-      });
-    }
-    
-    // Check if user already exists
-    const [existingUsers] = await req.db.execute(
-      'SELECT * FROM users WHERE email = ?',
-      [email]
-    );
-    
-    if (existingUsers.length > 0) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'User with this email already exists'
-      });
-    }
-    
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    
-    // Create new user (default role is 'student')
-    const [result] = await req.db.execute(
-      'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-      [name, email, hashedPassword, 'student']
-    );
-    
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: result.insertId, name, email, role: 'student' },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-    
-    res.status(201).json({
-      status: 'success',
-      message: 'User registered successfully',
-      data: {
-        token,
-        user: {
-          id: result.insertId,
-          name,
-          email,
-          role: 'student'
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Registration error:', error.message);
-    res.status(500).json({
-      status: 'error',
-      message: 'Registration failed. Please try again.'
-    });
-  }
-});
-
-/**
- * @route   POST /api/auth/login
- * @desc    Authenticate user & get token
- * @access  Public
- */
-router.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    
-    // Validate input
-    if (!email || !password) {
-      return res.status(400).json({
-        status: 'error',
-        message: 'Please provide email and password'
-      });
-    }
-    
-    // Check if user exists
-    const [users] = await req.db.execute(
-      'SELECT * FROM users WHERE email = ?',
-      [email]
-    );
-    
-    if (users.length === 0) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'Invalid credentials'
-      });
-    }
-    
-    const user = users[0];
-    
-    // Check password
-    const isMatch = await bcrypt.compare(password, user.password);
-    
-    if (!isMatch) {
-      return res.status(401).json({
-        status: 'error',
-        message: 'Invalid credentials'
-      });
-    }
-    
-    // Update last signed in timestamp (if column exists)
-    try {
-      await req.db.execute(
-        'UPDATE users SET last_signed_in = NOW() WHERE id = ?',
-        [user.id]
-      );
-    } catch (error) {
-      console.log('last_signed_in column not found, skipping update');
-    }
-    
-    // Generate JWT token
-    const token = jwt.sign(
-      { id: user.id, name: user.name, email: user.email, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-    
-    res.status(200).json({
-      status: 'success',
-      message: 'Login successful',
-      data: {
-        token,
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Login error:', error.message);
-    res.status(500).json({
-      status: 'error',
-      message: 'Login failed. Please try again.'
-    });
-  }
-});
+router.post('/sync', syncUser);
 
 /**
  * @route   GET /api/auth/me
@@ -165,7 +19,7 @@ router.post('/login', async (req, res) => {
 router.get('/me', authenticate, async (req, res) => {
   try {
     const [users] = await req.db.execute(
-      'SELECT id, name, email, role, created_at FROM users WHERE id = ?',
+      'SELECT id, firebase_uid, name, email, email_verified, role, created_at, last_signed_in FROM users WHERE id = ?',
       [req.user.id]
     );
     
@@ -176,10 +30,21 @@ router.get('/me', authenticate, async (req, res) => {
       });
     }
     
+    const user = users[0];
+    
     res.status(200).json({
       status: 'success',
       data: {
-        user: users[0]
+        user: {
+          id: user.id,
+          firebase_uid: user.firebase_uid,
+          name: user.name,
+          email: user.email,
+          email_verified: Boolean(user.email_verified),
+          role: user.role,
+          created_at: user.created_at,
+          last_signed_in: user.last_signed_in
+        }
       }
     });
   } catch (error) {

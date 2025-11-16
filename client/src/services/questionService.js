@@ -1,11 +1,16 @@
 import axios from 'axios';
+import { auth } from '../config/firebase';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-// Set up axios with token
-const getAuthHeader = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+// Set up axios with Firebase token
+const getAuthHeader = async () => {
+  const user = auth.currentUser;
+  if (user) {
+    const token = await user.getIdToken();
+    return { Authorization: `Bearer ${token}` };
+  }
+  return {};
 };
 
 /**
@@ -44,7 +49,7 @@ export const getQuestion = async (id) => {
 export const runCode = async (data) => {
   try {
     const response = await axios.post(`${API_URL}/submissions/run`, data, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -61,7 +66,7 @@ export const runCode = async (data) => {
 export const submitCode = async (questionId, data) => {
   try {
     const response = await axios.post(`${API_URL}/submissions/${questionId}`, data, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -77,7 +82,7 @@ export const submitCode = async (questionId, data) => {
 export const getUserSubmissions = async (params = {}) => {
   try {
     const response = await axios.get(`${API_URL}/submissions/user`, {
-      headers: getAuthHeader(),
+      headers: await getAuthHeader(),
       params
     });
     return response.data.data;
@@ -94,7 +99,7 @@ export const getUserSubmissions = async (params = {}) => {
 export const getSubmission = async (id) => {
   try {
     const response = await axios.get(`${API_URL}/submissions/${id}`, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -109,7 +114,7 @@ export const getSubmission = async (id) => {
 export const getUserStats = async () => {
   try {
     const response = await axios.get(`${API_URL}/submissions/stats/user`, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {

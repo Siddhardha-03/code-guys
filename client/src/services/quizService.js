@@ -1,11 +1,16 @@
 import axios from 'axios';
+import { auth } from '../config/firebase';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-// Set up axios with token
-const getAuthHeader = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
+// Set up axios with Firebase token
+const getAuthHeader = async () => {
+  const user = auth.currentUser;
+  if (user) {
+    const token = await user.getIdToken();
+    return { Authorization: `Bearer ${token}` };
+  }
+  return {};
 };
 
 /**
@@ -17,7 +22,7 @@ export const getQuizzes = async (params = {}) => {
   try {
     const response = await axios.get(`${API_URL}/quizzes`, { 
       params,
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -33,7 +38,7 @@ export const getQuizzes = async (params = {}) => {
 export const getQuiz = async (id) => {
   try {
     const response = await axios.get(`${API_URL}/quizzes/${id}`, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -50,7 +55,7 @@ export const getQuiz = async (id) => {
 export const submitQuiz = async (quizId, data) => {
   try {
     const response = await axios.post(`${API_URL}/quizzes/${quizId}/submit`, data, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -65,7 +70,7 @@ export const submitQuiz = async (quizId, data) => {
 export const getUserQuizSubmissions = async () => {
   try {
     const response = await axios.get(`${API_URL}/quizzes/submissions/user`, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -81,7 +86,7 @@ export const getUserQuizSubmissions = async () => {
 export const getQuizResults = async (quizId) => {
   try {
     const response = await axios.get(`${API_URL}/quizzes/${quizId}/results`, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
@@ -96,7 +101,7 @@ export const getQuizResults = async (quizId) => {
 export const getUserQuizStats = async () => {
   try {
     const response = await axios.get(`${API_URL}/quizzes/stats/user`, {
-      headers: getAuthHeader()
+      headers: await getAuthHeader()
     });
     return response.data.data;
   } catch (error) {
