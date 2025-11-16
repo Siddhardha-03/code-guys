@@ -9,7 +9,8 @@ const CodeEditor = ({
   height = '600px',
   readOnly = false,
   showHeader = true,
-  title = 'Code Editor'
+  title = 'Code Editor',
+  className = ''
 }) => {
   const [editorValue, setEditorValue] = useState(code || '');
   const { isDark } = useTheme();
@@ -147,7 +148,7 @@ const CodeEditor = ({
   const currentTheme = isDark ? 'nightfall-dark' : 'vs';
 
   return (
-    <div className="code-editor-container">
+    <div className={className || "code-editor-container"}>
       {showHeader && (
         <div className="code-editor-header">
           <div className="code-editor-title">

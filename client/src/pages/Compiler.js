@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { executeCode, getLanguages, getTemplate } from '../services/compilerService';
 import CodeEditor from '../components/CodeEditor';
+import OutputModal from '../components/OutputModal';
 
 const Compiler = ({ user }) => {
   const [code, setCode] = useState('');
@@ -11,6 +12,7 @@ const Compiler = ({ user }) => {
   const [error, setError] = useState('');
   const [languages, setLanguages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showOutputModal, setShowOutputModal] = useState(false);
 
   const fetchLanguages = useCallback(async () => {
     try {
@@ -92,6 +94,11 @@ const Compiler = ({ user }) => {
       if (result.stderr || result.compileOutput) {
         setError(result.stderr || result.compileOutput);
       }
+      
+      // Open modal on mobile after execution
+      if (window.innerWidth < 1024) {
+        setShowOutputModal(true);
+      }
     } catch (err) {
       setError(err.toString());
     } finally {
@@ -168,6 +175,15 @@ const Compiler = ({ user }) => {
                   'Run Code'
                 )}
               </button>
+              {/* View Output button for mobile */}
+              {output && (
+                <button
+                  onClick={() => setShowOutputModal(true)}
+                  className="lg:hidden btn btn-success btn-sm"
+                >
+                  View Output
+                </button>
+              )}
             </div>
           </div>
           
@@ -234,6 +250,30 @@ const Compiler = ({ user }) => {
           </div>
         </div>
       </div>
+
+      {/* Output Modal for Mobile */}
+      <OutputModal 
+        isOpen={showOutputModal} 
+        onClose={() => setShowOutputModal(false)}
+        title="Output"
+      >
+        {error && (
+          <div className="alert alert-danger mb-4">
+            {error}
+          </div>
+        )}
+        
+        {executing ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="spinner mr-2"></div>
+            <span>Executing your code...</span>
+          </div>
+        ) : (
+          <pre className="whitespace-pre-wrap text-sm font-mono bg-gray-50 dark:bg-gray-900 p-3 rounded border dark:border-gray-600">
+            {output || 'Run your code to see the output here.'}
+          </pre>
+        )}
+      </OutputModal>
     </div>
   );
 };

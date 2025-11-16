@@ -16,6 +16,7 @@ import {
   saveCodeDraft
 } from '../services/submissionService';
 import CodeEditor from '../components/CodeEditor';
+import OutputModal from '../components/OutputModal';
 import { getCodeTemplate } from '../utils/scaffoldings';
 
 /**
@@ -46,6 +47,7 @@ const ProblemDetail = ({ user }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('description');
+  const [showOutputModal, setShowOutputModal] = useState(false);
   
   // Submission tracking
   const [submissions, setSubmissions] = useState([]);
@@ -275,6 +277,11 @@ const ProblemDetail = ({ user }) => {
         }
       ]);
       setResultStatus(passed ? 'success' : errorOutput ? 'error' : 'failed');
+      
+      // Open modal on mobile after execution
+      if (window.innerWidth < 1024) {
+        setShowOutputModal(true);
+      }
     } catch (err) {
       setError(err.message || 'Failed to execute code');
       setResultStatus('error');
@@ -359,6 +366,11 @@ const ProblemDetail = ({ user }) => {
         setResultStatus('error');
       } else {
         setResultStatus('failed');
+      }
+
+      // Open modal on mobile after submission
+      if (window.innerWidth < 1024) {
+        setShowOutputModal(true);
       }
 
       await fetchSubmissions();
@@ -749,32 +761,43 @@ const ProblemDetail = ({ user }) => {
                     </span>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={handleRunCode}
                       disabled={executing || submitting}
-                      className="w-full sm:w-auto px-4 py-2 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-100 dark:hover:bg-gray-200 dark:text-gray-900"
+                      className="px-3 py-1.5 text-xs sm:text-sm bg-gray-600 hover:bg-gray-700 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-100 dark:hover:bg-gray-200 dark:text-gray-900"
                     >
                       {executing ? 'Running…' : 'Run Test'}
                     </button>
                     <button
                       onClick={handleSubmitCode}
                       disabled={submitting}
-                      className="w-full sm:w-auto px-4 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-400 dark:hover:bg-blue-300 dark:text-blue-950"
+                      className="px-3 py-1.5 text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-400 dark:hover:bg-blue-300 dark:text-blue-950"
                     >
                       {submitting ? 'Submitting…' : 'Submit Solution'}
                     </button>
+                    {/* View Output button for mobile */}
+                    {(output || testResults.length > 0) && (
+                      <button
+                        onClick={() => setShowOutputModal(true)}
+                        className="lg:hidden px-3 py-1.5 text-xs sm:text-sm bg-green-600 hover:bg-green-700 text-white rounded-md"
+                      >
+                        View Output
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
               
-              <div className="h-[400px] sm:h-[500px] lg:h-[720px]">
+              <div className="h-[400px] sm:h-[500px] lg:h-[600px]">
                 <CodeEditor
                   code={code}
                   language={language}
                   onChange={handleCodeChange}
                   height="100%"
                   title="Solution"
+                  showHeader={false}
+                  className="h-full"
                 />
               </div>
             </div>
@@ -899,6 +922,122 @@ const ProblemDetail = ({ user }) => {
           </div>
         </div>
       </div>
+
+      {/* Output Modal for Mobile */}
+      <OutputModal 
+        isOpen={showOutputModal} 
+        onClose={() => setShowOutputModal(false)}
+        title="Output"
+      >
+        {error && (
+          <div className="bg-red-100 dark:bg-red-900/40 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-200 px-4 py-3 rounded mb-4">
+            <strong>Error:</strong> {error}
+          </div>
+        )}
+        
+        {(executing || submitting) ? (
+          <div className="flex items-center justify-center py-8 text-gray-600 dark:text-gray-300">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 dark:border-blue-300 mr-3"></div>
+            <span>{submitting ? 'Running all test cases…' : 'Executing code…'}</span>
+          </div>
+        ) : output ? (
+          <div className="space-y-4">
+            <pre className="whitespace-pre-wrap text-sm font-mono bg-gray-50 dark:bg-gray-900 p-3 rounded border dark:border-gray-600 overflow-x-auto">
+              {output}
+            </pre>
+
+            {resultStatus === 'success' && (
+              <div className="bg-green-100 dark:bg-green-900/40 border border-green-400 dark:border-green-600 text-green-700 dark:text-green-200 px-4 py-3 rounded">
+                <strong>All tests passed!</strong> Great job—your solution meets all checks we can reveal.
+              </div>
+            )}
+
+            {resultStatus === 'failed' && (
+              <div className="bg-yellow-100 dark:bg-yellow-900/40 border border-yellow-400 dark:border-yellow-600 text-yellow-800 dark:text-yellow-200 px-4 py-3 rounded">
+                <strong>Some tests failed.</strong> Review the details below to debug your solution.
+              </div>
+            )}
+
+            {resultStatus === 'error' && (
+              <div className="bg-red-100 dark:bg-red-900/40 border border-red-400 dark:border-red-600 text-red-700 dark:text-red-200 px-4 py-3 rounded">
+                <strong>Execution error.</strong> Check the output above for more information.
+              </div>
+            )}
+
+            {testResults.length > 0 && (
+              <div className="space-y-3">
+                {testResults.map((test) => {
+                  const badgeClasses = test.passed
+                    ? 'bg-green-100 dark:bg-green-800/30 text-green-800 dark:text-green-200 border-green-200 dark:border-green-500'
+                    : 'bg-red-100 dark:bg-red-800/30 text-red-800 dark:text-red-200 border-red-200 dark:border-red-500';
+
+                  return (
+                    <div
+                      key={test.testCaseNumber}
+                      className={`rounded-lg border px-3 sm:px-4 py-3 text-sm ${badgeClasses}`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-semibold text-sm">
+                          Test Case {test.testCaseNumber} {test.hidden ? '(Hidden)' : ''}
+                        </span>
+                        <span className="text-xs uppercase tracking-wide">
+                          {test.passed ? 'Passed' : (test.error ? 'Error' : 'Failed')}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                        <div>
+                          <span className="font-medium text-gray-600 dark:text-gray-300 block mb-1">Input</span>
+                          <div className="bg-white/60 dark:bg-gray-900 border border-white/40 dark:border-gray-600 rounded p-2 font-mono break-all">
+                            {test.input || '—'}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="font-medium text-gray-600 dark:text-gray-300 block mb-1">Expected</span>
+                          <div className="bg-white/60 dark:bg-gray-800 border border-white/40 dark:border-gray-700 rounded p-2 font-mono break-all">
+                            {test.hidden ? 'Hidden' : (test.expectedOutput || '—')}
+                          </div>
+                        </div>
+                        <div>
+                          <span className="font-medium text-gray-600 dark:text-gray-300 block mb-1">Actual</span>
+                          <div className="bg-white/60 dark:bg-gray-800 border border-white/40 dark:border-gray-700 rounded p-2 font-mono break-all">
+                            {test.actualOutput || (test.error ? 'Error' : '—')}
+                          </div>
+                        </div>
+                      </div>
+
+                      {test.hidden && (
+                        <p className="text-xs text-gray-700 dark:text-gray-300 mt-2">
+                          Hidden case details are revealed after submission.
+                        </p>
+                      )}
+
+                      {test.error && (
+                        <div className="mt-2">
+                          <span className="font-medium text-gray-600 dark:text-gray-300 block mb-1">Error</span>
+                          <pre className="bg-white/60 dark:bg-gray-900 border border-white/40 dark:border-gray-600 rounded p-2 font-mono whitespace-pre-wrap text-xs break-all">
+                            {test.error}
+                          </pre>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center py-12 text-gray-500">
+            <div className="text-center">
+              <svg className="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p className="text-sm">Run your code to see output here.</p>
+              <p className="text-xs text-gray-400 mt-1">Use "Run Test" to check a single case or "Submit" to run all test cases.</p>
+            </div>
+          </div>
+        )}
+      </OutputModal>
     </div>
   );
 };
