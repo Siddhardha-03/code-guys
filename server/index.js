@@ -16,19 +16,15 @@ const app = express();
 
 // Middleware
 
-// CORS - allow production frontend and localhost for dev
-const allowedOrigins = [
-  'https://code-guys-1.onrender.com',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-].filter(Boolean);
-
-// Allow overriding/adding via env (comma-separated)
-if (process.env.CLIENT_URL) {
-  allowedOrigins.push(...process.env.CLIENT_URL.split(',').map(s => s.trim()));
-}
+// Dynamic CORS: derive allowed origins from CLIENT_URL env (comma-separated)
+// Example .env:
+// CLIENT_URL=https://code-guys-1.onrender.com,http://localhost:3000
+const rawOrigins = process.env.CLIENT_URL || 'https://code-guys-1.onrender.com,http://localhost:3000';
+const allowedOrigins = rawOrigins
+  .split(',')
+  .map(o => o.trim())
+  .filter(o => o.length > 0);
+console.log('[CORS] Allowed origins:', allowedOrigins);
 
 const corsOptions = {
   origin: function (origin, callback) {
