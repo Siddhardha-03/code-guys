@@ -468,7 +468,7 @@ const ProblemDetail = ({ user }) => {
       <div className="w-full px-3 sm:px-6 py-4 flex-1">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,45%)_minmax(0,55%)] gap-4 sm:gap-6 items-start">
           {/* Left Panel - Problem Description with Tabs */}
-          <div className="bg-white rounded-lg shadow-sm border overflow-hidden order-2 lg:order-1">
+          <div className="bg-white rounded-lg shadow-sm border overflow-hidden order-1 lg:order-1">
             {/* Tab Navigation */}
             <div className="border-b bg-gray-50 overflow-x-auto">
               <nav className="flex min-w-max">
@@ -494,6 +494,16 @@ const ProblemDetail = ({ user }) => {
                     Submissions ({submissionStats.attempts})
                   </button>
                 )}
+                <button
+                  onClick={() => setActiveTab('testcases')}
+                  className={`lg:hidden px-3 sm:px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap ${
+                    activeTab === 'testcases'
+                      ? 'border-blue-500 text-blue-600 bg-white'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Test Cases ({testCases.length})
+                </button>
                 <button
                   onClick={() => setActiveTab('hints')}
                   className={`px-3 sm:px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap ${
@@ -549,55 +559,57 @@ const ProblemDetail = ({ user }) => {
                 </div>
               )}
               
-              {/* Test Cases Preview */}
-              {testCases && testCases.length > 0 && (
-                <div className="test-cases-section">
-                  <h4 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Test Cases</h4>
-                  <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
-                      <strong>Note:</strong> Showing all available test cases. Hidden test cases are marked accordingly.
-                    </p>
-                    <div className="space-y-3">
-                      {testCases.map((testCase, index) => (
-                        <div key={index} className={`p-3 rounded border ${testCase.hidden ? 'bg-gray-100 dark:bg-gray-800 border-dashed' : 'bg-white dark:bg-gray-900'}`}>
-                          <div className="flex items-center justify-between mb-2">
-                            <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                              Test Case {index + 1}
+              {/* Test Cases Preview - Desktop Only */}
+              <div className="hidden lg:block">
+                {testCases && testCases.length > 0 && (
+                  <div className="test-cases-section">
+                    <h4 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Test Cases</h4>
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                      <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                        <strong>Note:</strong> Showing all available test cases. Hidden test cases are marked accordingly.
+                      </p>
+                      <div className="space-y-3">
+                        {testCases.map((testCase, index) => (
+                          <div key={index} className={`p-3 rounded border ${testCase.hidden ? 'bg-gray-100 dark:bg-gray-800 border-dashed' : 'bg-white dark:bg-gray-900'}`}>
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Test Case {index + 1}
+                              </div>
+                              {testCase.hidden && (
+                                <span className="text-xs bg-gray-500 dark:bg-gray-600 text-white px-2 py-1 rounded">
+                                  Hidden
+                                </span>
+                              )}
                             </div>
-                            {testCase.hidden && (
-                              <span className="text-xs bg-gray-500 dark:bg-gray-600 text-white px-2 py-1 rounded">
-                                Hidden
-                              </span>
-                            )}
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div>
-                              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Input:</span>
-                              <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded mt-1">
-                                <code className="text-xm font-mono">{testCase.input}</code>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div>
+                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Input:</span>
+                                <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded mt-1">
+                                  <code className="text-xm font-mono">{testCase.input}</code>
+                                </div>
+                              </div>
+                              <div>
+                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Expected Output:</span>
+                                <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded mt-1">
+                                  <code className="text-xm font-mono">
+                                    {testCase.hidden ? 'Hidden until submission' : testCase.expected_output}
+                                  </code>
+                                </div>
                               </div>
                             </div>
-                            <div>
-                              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Expected Output:</span>
-                              <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded mt-1">
-                                <code className="text-xm font-mono">
-                                  {testCase.hidden ? 'Hidden until submission' : testCase.expected_output}
-                                </code>
-                              </div>
-                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-3 text-xs text-yellow-700 dark:text-yellow-300">
-                      <p><strong>Total:</strong> {testCases.length} test cases ({testCases.filter(tc => !tc.hidden).length} visible, {testCases.filter(tc => tc.hidden).length} hidden)</p>
+                        ))}
+                      </div>
+                      <div className="mt-3 text-xs text-yellow-700 dark:text-yellow-300">
+                        <p><strong>Total:</strong> {testCases.length} test cases ({testCases.filter(tc => !tc.hidden).length} visible, {testCases.filter(tc => tc.hidden).length} hidden)</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
 
-                  {/* Constraints */}
-                  <div className="constraints-section">
+              {/* Constraints */}
+              <div className="constraints-section">
                     <h4 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">Constraints</h4>
                     <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
                       <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-1">
@@ -664,6 +676,58 @@ const ProblemDetail = ({ user }) => {
                 </div>
               )}
 
+              {activeTab === 'testcases' && (
+                <div className="space-y-4">
+                  <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Test Cases</h4>
+                  {testCases && testCases.length > 0 ? (
+                    <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                      <p className="text-sm text-gray-700 dark:text-gray-300 mb-3">
+                        <strong>Note:</strong> Showing all available test cases. Hidden test cases are marked accordingly.
+                      </p>
+                      <div className="space-y-3">
+                        {testCases.map((testCase, index) => (
+                          <div key={index} className={`p-3 rounded border ${testCase.hidden ? 'bg-gray-100 dark:bg-gray-800 border-dashed' : 'bg-white dark:bg-gray-900'}`}>
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Test Case {index + 1}
+                              </div>
+                              {testCase.hidden && (
+                                <span className="text-xs bg-gray-500 dark:bg-gray-600 text-white px-2 py-1 rounded">
+                                  Hidden
+                                </span>
+                              )}
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                              <div>
+                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Input:</span>
+                                <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded mt-1">
+                                  <code className="text-xm font-mono">{testCase.input}</code>
+                                </div>
+                              </div>
+                              <div>
+                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Expected Output:</span>
+                                <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded mt-1">
+                                  <code className="text-xm font-mono">
+                                    {testCase.hidden ? 'Hidden until submission' : testCase.expected_output}
+                                  </code>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-3 text-xs text-yellow-700 dark:text-yellow-300">
+                        <p><strong>Total:</strong> {testCases.length} test cases ({testCases.filter(tc => !tc.hidden).length} visible, {testCases.filter(tc => tc.hidden).length} hidden)</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <p>No test cases available.</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {activeTab === 'hints' && (
                 <div className="space-y-4">
                   <h4 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Hints & Tips</h4>
@@ -718,7 +782,7 @@ const ProblemDetail = ({ user }) => {
           </div>
 
           {/* Right Panel - Code Editor and Output */}
-          <div className="flex flex-col gap-4 order-1 lg:order-2">
+          <div className="flex flex-col gap-4 order-2 lg:order-2">
             {/* Code Editor */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-600 overflow-hidden flex-1">
               <div className="border-b bg-gray-50 dark:bg-gray-700 dark:border-gray-600 px-3 sm:px-4 py-3 space-y-3">
